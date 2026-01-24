@@ -1,21 +1,23 @@
 {
-  "name": "git-acp",
+  "name": "aicommit",
   "version": "1.0.0",
-  "description": "智能Git提交工具",
-  "main": "dist/git-acp.js",
+  "description": "AI commit message CLI",
+  "main": "dist/cli.js",
   "bin": {
-    "git-acp": "./dist/git-acp.js"
+    "aicommit": "./dist/cli.js",
+    "aic": "./dist/cli.js"
   },
   "scripts": {
     "build": "tsc",
-    "dev": "ts-node git-acp.ts",
-    "install-global": "pnpm run build && pnpm install -g .",
-    "test-ai": "ts-node test-simple.ts"
+    "start": "node dist/cli.js",
+    "dev": "tsc -w",
+    "install-global": "pnpm run build && pnpm add -g ."
   },
   "keywords": [
     "git",
     "commit",
     "ai",
+    "openai",
     "gemini"
   ],
   "author": "",

@@ -1,83 +1,93 @@
-# Git ACP - AI驱动的智能提交工具
+# aicommit
 
-一个基于 TypeScript 的 Git 提交工具，使用 Google Gemini AI 自动生成准确、规范的提交消息。
+`aicommit` is a simple CLI tool. It generates a git commit message with AI.
 
-## ✨ 特性
+## Features
 
-- ✅ **TypeScript** - 类型安全和现代语法
-- ✅ **模块化设计** - 清晰的类结构，遵循单一职责原则
-- ✅ **错误处理** - 完善的异常处理和错误恢复
-- ✅ **中文提示** - 友好的用户界面
-- ✅ **智能提交消息** - AI生成的准确、规范的提交描述
-- ✅ **自动回退** - API失败时使用默认消息
-- ✅ **代理支持** - 支持HTTP代理配置
+- Generate a commit message from `git diff`
+- Support multiple providers (OpenAI, Gemini, OpenAI-compatible)
+- Simple JSON config file
 
-## 🚀 安装步骤
-
-### 1. 安装依赖
+## Install
 
 ```bash
-pnpm add -D typescript @types/node ts-node
-pnpm add undici
-```
-
-### 2. 设置环境变量
-
-```bash
-# 添加 Gemini API Key
-echo 'export GEMINI_API_KEY="your_api_key_here"' >> ~/.bashrc
-source ~/.bashrc
-
-# 可选：设置代理（如需要，HTTP/HTTPS 皆可）
-echo 'export HTTPS_PROXY="http://127.0.0.1:7890"' >> ~/.bashrc
-# 或
-echo 'export HTTP_PROXY="http://127.0.0.1:7890"' >> ~/.bashrc
-```
-
-### 3. 构建和安装
-
-```bash
-# 构建项目
+pnpm install
 pnpm build
-
-# 或者直接链接到全局（开发时推荐）
-pnpm link --global
 ```
 
-### 4. 设置 Git 别名（可选）
+You can run it without global install:
 
 ```bash
-git config --global alias.acp '!git-acp'
+node dist/cli.js
 ```
 
-## 📦 项目结构
-
-```
-git-acp/
-├── git-acp.ts          # 主要源代码
-├── package.json        # 项目配置
-├── tsconfig.json       # TypeScript配置
-├── dist/              # 编译输出目录
-└── README.md          # 项目文档
-```
-
-## 🎯 使用方法
-
-### 基本使用
+Or install it globally:
 
 ```bash
-# 在任何 git 仓库中执行
-git-acp
-
-# 或者使用别名（如果已配置）
-git acp
+pnpm install -g .
 ```
 
-### 开发模式
+## Usage
+
+Run in any git repo:
 
 ```bash
-# 使用 ts-node 直接运行
-pnpm dev
+aicommit
+```
+
+It will:
+1) `git add -A`
+2) read `git diff --cached`
+3) call your AI provider
+4) `git commit`
+5) `git push`
+
+## Config
+
+Create a file at `~/.aicommit`:
+
+```json
+{
+  "activeProviderName": "openai",
+  "providers": [
+    {
+      "name": "openai",
+      "baseUrl": "https://api.openai.com/v1",
+      "apiKey": "sk-your-api-key",
+      "model": "gpt-4o-mini"
+    }
+  ]
+}
+```
+
+Gemini example:
+
+```json
+{
+  "activeProviderName": "gemini",
+  "providers": [
+    {
+      "name": "gemini",
+      "baseUrl": "https://generativelanguage.googleapis.com/v1beta",
+      "apiKey": "your-gemini-api-key",
+      "model": "gemini-2.5-flash"
+    }
+  ]
+}
+```
+
+## Project structure
+
+```
+src/
+  cli.ts
+  commands/
+    acp.ts
+  utils/
+    config.ts
+    git.ts
+  ai/
+    engine.ts
 ```
 
 ### 查看帮助
