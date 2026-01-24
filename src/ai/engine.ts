@@ -9,18 +9,20 @@ const getProvider = (config: providerType) => {
     case 'openai':
       return createOpenAI({
         apiKey: config.apiKey,
-        ...(config.baseUrl ? { baseURL: config.baseUrl } : {}),
-      })
-    case 'openaiCompatible':
-      return createOpenAICompatible({
-        name: config.name,
-        apiKey: config.apiKey,
-        baseURL: config.baseUrl,
+        ...(config.baseUrl && { baseURL: config.baseUrl }),
       })
     case 'gemini':
       return createGoogleGenerativeAI({
         apiKey: config.apiKey,
-        ...(config.baseUrl ? { baseURL: config.baseUrl } : {}),
+        ...(config.baseUrl && { baseURL: config.baseUrl }),
+      })
+    case 'glm':
+    case 'minimax':
+    case 'deepseek':
+      return createOpenAICompatible({
+        name: config.name,
+        apiKey: config.apiKey,
+        baseURL: config.baseUrl,
       })
     default:
       throw new Error(`invalid provider: ${config.name}`)
