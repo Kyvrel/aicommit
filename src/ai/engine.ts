@@ -5,7 +5,6 @@ import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
 import { createOpenAI } from '@ai-sdk/openai'
 
 const getProvider = (config: providerType) => {
-  console.log(`config`)
   switch (config.name) {
     case 'openai':
       return createOpenAI({

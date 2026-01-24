@@ -21,7 +21,6 @@ const fileExists = (filePath: string) => {
 const getConfigPath = () => path.join(os.homedir(), '.aicommit')
 
 const validateConfig = (config: AppType): AppType => {
-  console.log('================', config)
   if (!config.activeProviderName) {
     throw new Error(`no activeProviderName`)
   }
@@ -47,7 +46,6 @@ export const getConfig = (): AppType => {
   if (!fileExists(configPath)) {
     throw new Error(`need ai config`)
   }
-  console.log('======', configPath)
   const data = readFileSync(configPath, 'utf-8')
 
   const config = JSON.parse(data)
