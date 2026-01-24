@@ -1,0 +1,11 @@
+{
+  "activeProviderName": "openai",
+  "providers": [
+    {
+      "name": "openai",
+      "baseUrl": "https://api.openai.com/v1",
+      "apiKey": "sk-your-api-key",
+      "model": "gpt-4o-mini"
+    }
+  ]
+}
