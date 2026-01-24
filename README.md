@@ -90,119 +90,119 @@ src/
     engine.ts
 ```
 
-### 查看帮助
+### Help
 
 ```bash
-git-acp --help
+aicommit --help
 ```
 
-## 🔑 环境变量
+## 🔑 Environment variables
 
-| 变量名 | 必需 | 默认值 | 描述 |
+| Name | Required | Default | Description |
 |--------|------|--------|------|
-| `GEMINI_API_KEY` | ✅ | - | Google Gemini API 密钥 |
-| `HTTPS_PROXY` / `https_proxy` | ❌ | `http://127.0.0.1:7893` | HTTPS 代理地址（设定则覆盖默认） |
-| `HTTP_PROXY` / `http_proxy` | ❌ | `http://127.0.0.1:7893` | HTTP 代理地址（设定则覆盖默认） |
+| `GEMINI_API_KEY` | ✅ | - | Google Gemini API key |
+| `HTTPS_PROXY` / `https_proxy` | ❌ | `http://127.0.0.1:7893` | HTTPS proxy URL (overrides default if set) |
+| `HTTP_PROXY` / `http_proxy` | ❌ | `http://127.0.0.1:7893` | HTTP proxy URL (overrides default if set) |
 
-## 🏗️ 架构设计
+## 🏗️ Architecture
 
-项目采用模块化设计，遵循单一职责原则：
+This project uses a modular design and follows the single-responsibility principle:
 
-### 核心类
+### Core classes
 
-- **ConfigManager** - 配置管理职责
-  - 加载和验证环境变量
-  - 提供配置对象
+- **ConfigManager** - Configuration management
+  - Load and validate environment variables
+  - Provide the config object
 
-- **GitOperations** - Git操作职责
-  - 执行Git命令
-  - 检查变更状态  
-  - 添加、提交、推送操作
+- **GitOperations** - Git operations
+  - Run git commands
+  - Check change status
+  - Add, commit, and push
 
-- **AICommitGenerator** - AI生成职责
-  - 调用 Gemini API
-  - 生成提交消息
-  - 处理API错误
+- **AICommitGenerator** - AI generation
+  - Call the Gemini API
+  - Generate commit messages
+  - Handle API errors
 
-- **CLIApp** - 应用流程控制职责
-  - 组织整个工作流程
-  - 用户交互和错误处理
-  - 显示帮助信息
+- **CLIApp** - App flow control
+  - Orchestrate the full workflow
+  - User interaction and error handling
+  - Show help
 
-## 📋 工作流程
+## 📋 Workflow
 
-1. **检查变更** - 检查是否有待提交的文件
-2. **添加文件** - 自动执行 `git add -A`
-3. **获取差异** - 获取暂存区的 diff 内容
-4. **AI生成** - 调用 Gemini API 生成提交消息
-5. **提交代码** - 使用生成的消息提交
-6. **推送远程** - 自动推送到远程仓库
+1. **Check changes** - Check if there are files to commit
+2. **Stage files** - Run `git add -A` automatically
+3. **Get diff** - Read the staged diff (`git diff --cached`)
+4. **AI generate** - Call the Gemini API to generate a commit message
+5. **Commit** - Commit with the generated message
+6. **Push** - Push to the remote repository
 
-## 🛠️ 开发命令
+## 🛠️ Development
 
 ```bash
-# 安装依赖
+# Install dependencies
 pnpm install
 
-# 开发模式运行
+# Run in dev mode
 pnpm dev
 
-# 构建项目
+# Build
 pnpm build
 
-# 全局安装
+# Install globally
 pnpm install-global
 ```
 
-## 🐛 故障排除
+## 🐛 Troubleshooting
 
-### API密钥问题
+### API key issues
 ```bash
-# 检查环境变量是否设置
+# Check if the env var is set
 echo $GEMINI_API_KEY
 ```
 
-### 代理问题  
+### Proxy issues
 ```bash
-# 检查代理设置
+# Check proxy settings
 echo $HTTPS_PROXY
 echo $https_proxy
 echo $HTTP_PROXY
 echo $http_proxy
 ```
 
-- 默认情况下，工具会尝试通过 `http://127.0.0.1:7893` 代理访问 Gemini。
-- 如果你的本地没有该端口的代理，请设置 `HTTPS_PROXY` 或 `HTTP_PROXY` 为你的代理地址，或停用代理后再运行（不建议直连）。
+- By default, the tool will try to access Gemini via `http://127.0.0.1:7893`.
+- If you do not have a local proxy on that port, set `HTTPS_PROXY` or `HTTP_PROXY` to your proxy URL, or disable proxy and run again (direct access is not recommended).
 
-## 🌐 代理方案对比与适用场景
+## 🌐 Proxy options and when to use them
 
-- **Undici ProxyAgent（本项目采用）**: 与 Node 18+ 原生 `fetch` 完全匹配，使用 `fetch(url, { dispatcher: new ProxyAgent(proxyUrl) })` 传入代理。
-  - 适用：使用全局 `fetch`/Undici 发起请求的场景。
-  - 优点：零适配、性能稳定、由 Node 团队维护。
-  - 协议：HTTP/HTTPS 代理。若需 SOCKS，可配合第三方代理适配器。
+- **Undici ProxyAgent (used in this project)**: Fully matches Node 18+ built-in `fetch`. Use `fetch(url, { dispatcher: new ProxyAgent(proxyUrl) })`.
+  - Use when you make requests with global `fetch` / Undici.
+  - Pros: no extra adapter, stable performance, maintained by the Node team.
+  - Protocols: HTTP/HTTPS. For SOCKS, use a third-party adapter.
 
-- **proxy-agent（替代方案）**: 面向 `http.request/https.request`、`axios/got` 等使用 `http.Agent` 的库。
-  - 适用：你使用的是 `axios/got` 或底层 `http/https` API，需要 `agent` 选项的场景。
-  - 优点：自动解析多种代理方案（含 PAC、SOCKS）。
-  - 注意：Node 原生 `fetch` 不支持 `agent` 选项，直接传 `agent` 无效。
+- **proxy-agent (alternative)**: For libraries that use `http.Agent`, like `http.request/https.request`, `axios`, `got`.
+  - Use when you need an `agent` option.
+  - Pros: auto-detect many proxy types (PAC, SOCKS).
+  - Note: Node built-in `fetch` does not support the `agent` option.
 
-- **本项目推荐**: 使用 Undici 的 `ProxyAgent` 并通过环境变量 `HTTPS_PROXY`/`HTTP_PROXY` 显式配置。当确实需要 SOCKS/PAC 时，再考虑换用对应方案或引入适配器。
+- **Recommended**: Use Undici `ProxyAgent` and configure it via `HTTPS_PROXY` / `HTTP_PROXY`. If you really need SOCKS/PAC, then switch to another solution or add an adapter.
 
-### 权限问题
+### Permission issues
 ```bash
-# 重新链接全局命令
+# Re-link the global command
 pnpm unlink --global
 pnpm link --global
 ```
 
-## 📝 许可证
+## 📝 License
 
 ISC License
 
-## 🤝 贡献
+## 🤝 Contributing
 
-欢迎提交 Issue 和 Pull Request！
+Issues and pull requests are welcome!
 
 ---
 
-**注意**: 请确保在使用前正确设置 `GEMINI_API_KEY` 环境变量。
+**Note**: Make sure you set the `GEMINI_API_KEY` env var before use.

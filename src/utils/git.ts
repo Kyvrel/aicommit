@@ -1,60 +1,60 @@
 import { execSync } from "child_process"
 
 export class GitOperations {
-  // 执行git命令
+  // Run a git command
   execGit(command: string): string {
     try {
       return execSync(`git ${command}`, { encoding: "utf8" })
     } catch (error) {
-      throw new Error(`Git命令执行失败: ${command}`)
+      throw new Error(`Git command failed: ${command}`)
     }
   }
 
-  // 检查是否有未提交的更改
+  // Check if there are uncommitted changes
   hasChanges(): boolean {
     const status = this.execGit("status --porcelain")
     return status.trim().length > 0
   }
 
-  // 获取暂存区的diff
+  // Get staged diff
   getStagedDiff(): string {
     return this.execGit("diff --cached")
   }
 
-  // 添加所有更改
+  // Stage all changes
   addAllChanges(): void {
     this.execGit("add -A")
   }
 
-  // 提交更改（支持多行message）
+  // Commit changes (supports multi-line messages)
   commit(message: string): void {
-    // 使用heredoc支持多行commit message
+    // Use heredoc for multi-line commit messages
     const escapedMessage = message.replace(/'/g, "'\\''")
     const command = `commit -F- <<'EOF'\n${escapedMessage}\nEOF`
     this.execGit(command)
   }
 
-  // 推送到远程
+  // Push to remote
   push(): void {
     this.execGit("push")
   }
 
-  // 获取最新提交的ID
+  // Get the latest commit id
   getLatestCommitId(): string {
     return this.execGit("rev-parse HEAD").trim()
   }
 
-  // 获取当前分支名
+  // Get current branch name
   getCurrentBranch(): string {
     return this.execGit("branch --show-current").trim()
   }
 
-  // 创建并切换到新分支
+  // Create and checkout a new branch
   createAndCheckoutBranch(branchName: string): void {
     this.execGit(`checkout -b "${branchName}"`)
   }
 
-  // 推送并设置上游分支
+  // Push and set upstream
   pushWithUpstream(branchName: string): void {
     this.execGit(`push -u origin "${branchName}"`)
   }
