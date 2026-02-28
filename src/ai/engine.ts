@@ -29,7 +29,7 @@ const getProvider = (config: providerType) => {
   }
 }
 
-const systemPrompt = `You are a tool that shortens git commit messages. Given a commit message, make it shorter while preserving the key information and format. The shortened message must be 100 characters or less. Respond with ONLY the shortened commit message.`
+const systemPrompt = `You are a tool that generates git commit messages. Given a git diff, generate a concise and descriptive commit message that summarizes the changes. The commit message must be 100 characters or less. Respond with ONLY the commit message.`
 
 export const generateCommitMessage = async (
   config: providerType,
