@@ -4,10 +4,10 @@ import os from 'node:os'
 
 export type AppType = {
   activeProviderName: string
-  providers: providerType[]
+  providers: ProviderType[]
 }
 
-export type providerType = {
+export type ProviderType = {
   name: string
   baseUrl: string
   apiKey: string

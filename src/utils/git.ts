@@ -28,10 +28,8 @@ export class GitOperations {
 
   // Commit changes (supports multi-line messages)
   commit(message: string): void {
-    // Use heredoc for multi-line commit messages
-    const escapedMessage = message.replace(/'/g, "'\\''")
-    const command = `commit -F- <<'EOF'\n${escapedMessage}\nEOF`
-    this.execGit(command)
+    // Pass message via stdin to avoid shell injection
+    execSync('git commit -F -', { input: message, encoding: 'utf8' })
   }
 
   // Push to remote
