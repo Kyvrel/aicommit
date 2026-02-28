@@ -98,11 +98,7 @@ aicommit --help
 
 ## 🔑 Environment variables
 
-| Name | Required | Default | Description |
-|--------|------|--------|------|
-| `GEMINI_API_KEY` | ✅ | - | Google Gemini API key |
-| `HTTPS_PROXY` / `https_proxy` | ❌ | `http://127.0.0.1:7893` | HTTPS proxy URL (overrides default if set) |
-| `HTTP_PROXY` / `http_proxy` | ❌ | `http://127.0.0.1:7893` | HTTP proxy URL (overrides default if set) |
+There are no required environment variables. All configuration is done via the `~/.aicommit` config file.
 
 ## 🏗️ Architecture
 
@@ -162,32 +158,6 @@ pnpm install-global
 echo $GEMINI_API_KEY
 ```
 
-### Proxy issues
-```bash
-# Check proxy settings
-echo $HTTPS_PROXY
-echo $https_proxy
-echo $HTTP_PROXY
-echo $http_proxy
-```
-
-- By default, the tool will try to access Gemini via `http://127.0.0.1:7893`.
-- If you do not have a local proxy on that port, set `HTTPS_PROXY` or `HTTP_PROXY` to your proxy URL, or disable proxy and run again (direct access is not recommended).
-
-## 🌐 Proxy options and when to use them
-
-- **Undici ProxyAgent (used in this project)**: Fully matches Node 18+ built-in `fetch`. Use `fetch(url, { dispatcher: new ProxyAgent(proxyUrl) })`.
-  - Use when you make requests with global `fetch` / Undici.
-  - Pros: no extra adapter, stable performance, maintained by the Node team.
-  - Protocols: HTTP/HTTPS. For SOCKS, use a third-party adapter.
-
-- **proxy-agent (alternative)**: For libraries that use `http.Agent`, like `http.request/https.request`, `axios`, `got`.
-  - Use when you need an `agent` option.
-  - Pros: auto-detect many proxy types (PAC, SOCKS).
-  - Note: Node built-in `fetch` does not support the `agent` option.
-
-- **Recommended**: Use Undici `ProxyAgent` and configure it via `HTTPS_PROXY` / `HTTP_PROXY`. If you really need SOCKS/PAC, then switch to another solution or add an adapter.
-
 ### Permission issues
 ```bash
 # Re-link the global command
@@ -204,5 +174,3 @@ ISC License
 Issues and pull requests are welcome!
 
 ---
-
-**Note**: Make sure you set the `GEMINI_API_KEY` env var before use.
