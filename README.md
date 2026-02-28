@@ -98,43 +98,36 @@ aicommit --help
 
 ## 🔑 Environment variables
 
-| Name | Required | Default | Description |
-|--------|------|--------|------|
-| `GEMINI_API_KEY` | ✅ | - | Google Gemini API key |
-| `HTTPS_PROXY` / `https_proxy` | ❌ | `http://127.0.0.1:7893` | HTTPS proxy URL (overrides default if set) |
-| `HTTP_PROXY` / `http_proxy` | ❌ | `http://127.0.0.1:7893` | HTTP proxy URL (overrides default if set) |
+There are no required environment variables. All configuration is done via the `~/.aicommit` config file.
 
 ## 🏗️ Architecture
 
 This project uses a modular design and follows the single-responsibility principle:
 
-### Core classes
+### Core modules
 
-- **ConfigManager** - Configuration management
-  - Load and validate environment variables
-  - Provide the config object
+- **`utils/config.ts`** - Configuration management
+  - Read and validate `~/.aicommit` JSON config file
+  - Provide the active provider config object
 
-- **GitOperations** - Git operations
-  - Run git commands
-  - Check change status
-  - Add, commit, and push
+- **`utils/git.ts` (`GitOperations`)** - Git operations
+  - Run git commands via `execSync`
+  - Check change status, stage, commit, and push
 
-- **AICommitGenerator** - AI generation
-  - Call the Gemini API
-  - Generate commit messages
-  - Handle API errors
+- **`ai/engine.ts`** - AI generation
+  - Factory function to create the active AI provider (OpenAI, Gemini, OpenAI-compatible)
+  - Call the provider API to generate commit messages
 
-- **CLIApp** - App flow control
+- **`commands/acp.ts`** - App flow control
   - Orchestrate the full workflow
-  - User interaction and error handling
-  - Show help
+  - Error handling and user feedback
 
 ## 📋 Workflow
 
 1. **Check changes** - Check if there are files to commit
 2. **Stage files** - Run `git add -A` automatically
 3. **Get diff** - Read the staged diff (`git diff --cached`)
-4. **AI generate** - Call the Gemini API to generate a commit message
+4. **AI generate** - Call the configured AI provider API to generate a commit message
 5. **Commit** - Commit with the generated message
 6. **Push** - Push to the remote repository
 
@@ -157,36 +150,8 @@ pnpm install-global
 ## 🐛 Troubleshooting
 
 ### API key issues
-```bash
-# Check if the env var is set
-echo $GEMINI_API_KEY
-```
 
-### Proxy issues
-```bash
-# Check proxy settings
-echo $HTTPS_PROXY
-echo $https_proxy
-echo $HTTP_PROXY
-echo $http_proxy
-```
-
-- By default, the tool will try to access Gemini via `http://127.0.0.1:7893`.
-- If you do not have a local proxy on that port, set `HTTPS_PROXY` or `HTTP_PROXY` to your proxy URL, or disable proxy and run again (direct access is not recommended).
-
-## 🌐 Proxy options and when to use them
-
-- **Undici ProxyAgent (used in this project)**: Fully matches Node 18+ built-in `fetch`. Use `fetch(url, { dispatcher: new ProxyAgent(proxyUrl) })`.
-  - Use when you make requests with global `fetch` / Undici.
-  - Pros: no extra adapter, stable performance, maintained by the Node team.
-  - Protocols: HTTP/HTTPS. For SOCKS, use a third-party adapter.
-
-- **proxy-agent (alternative)**: For libraries that use `http.Agent`, like `http.request/https.request`, `axios`, `got`.
-  - Use when you need an `agent` option.
-  - Pros: auto-detect many proxy types (PAC, SOCKS).
-  - Note: Node built-in `fetch` does not support the `agent` option.
-
-- **Recommended**: Use Undici `ProxyAgent` and configure it via `HTTPS_PROXY` / `HTTP_PROXY`. If you really need SOCKS/PAC, then switch to another solution or add an adapter.
+Make sure your `apiKey` is correctly set in `~/.aicommit` for the active provider.
 
 ### Permission issues
 ```bash
@@ -204,5 +169,3 @@ ISC License
 Issues and pull requests are welcome!
 
 ---
-
-**Note**: Make sure you set the `GEMINI_API_KEY` env var before use.
