@@ -104,33 +104,30 @@ There are no required environment variables. All configuration is done via the `
 
 This project uses a modular design and follows the single-responsibility principle:
 
-### Core classes
+### Core modules
 
-- **ConfigManager** - Configuration management
-  - Load and validate environment variables
-  - Provide the config object
+- **`utils/config.ts`** - Configuration management
+  - Read and validate `~/.aicommit` JSON config file
+  - Provide the active provider config object
 
-- **GitOperations** - Git operations
-  - Run git commands
-  - Check change status
-  - Add, commit, and push
+- **`utils/git.ts` (`GitOperations`)** - Git operations
+  - Run git commands via `execSync`
+  - Check change status, stage, commit, and push
 
-- **AICommitGenerator** - AI generation
-  - Call the Gemini API
-  - Generate commit messages
-  - Handle API errors
+- **`ai/engine.ts`** - AI generation
+  - Factory function to create the active AI provider (OpenAI, Gemini, OpenAI-compatible)
+  - Call the provider API to generate commit messages
 
-- **CLIApp** - App flow control
+- **`commands/acp.ts`** - App flow control
   - Orchestrate the full workflow
-  - User interaction and error handling
-  - Show help
+  - Error handling and user feedback
 
 ## 📋 Workflow
 
 1. **Check changes** - Check if there are files to commit
 2. **Stage files** - Run `git add -A` automatically
 3. **Get diff** - Read the staged diff (`git diff --cached`)
-4. **AI generate** - Call the Gemini API to generate a commit message
+4. **AI generate** - Call the configured AI provider API to generate a commit message
 5. **Commit** - Commit with the generated message
 6. **Push** - Push to the remote repository
 
@@ -153,10 +150,8 @@ pnpm install-global
 ## 🐛 Troubleshooting
 
 ### API key issues
-```bash
-# Check if the env var is set
-echo $GEMINI_API_KEY
-```
+
+Make sure your `apiKey` is correctly set in `~/.aicommit` for the active provider.
 
 ### Permission issues
 ```bash
