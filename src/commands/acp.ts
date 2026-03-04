@@ -26,7 +26,7 @@ export default async () => {
     const config = getProviderConfig()
 
     // 4. Generate commit message
-    console.log('🤖 Generating commit message...')
+    console.log(`🤖 Generating commit message using ${config.model}...`)
     let commitMessage: string
     try {
       commitMessage = await generateCommitMessage(config, diffContent)
