@@ -30,6 +30,8 @@ const promptConflictAction = async (): Promise<'abort' | 'keep'> => {
 export default async () => {
   const git = new GitOperations()
   try {
+    const config = getProviderConfig()
+
     // 1. Check if there are changes
     if (!git.hasChanges()) {
       console.log('✅ No changes to commit')
@@ -46,8 +48,6 @@ export default async () => {
       console.log('✅ No staged changes')
       return
     }
-
-    const config = getProviderConfig()
 
     // 4. Generate commit message
     console.log(`🤖 Generating commit message using ${config.model}...`)

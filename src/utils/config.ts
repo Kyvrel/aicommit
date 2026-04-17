@@ -18,14 +18,26 @@ const fileExists = (filePath: string) => {
   return existsSync(filePath)
 }
 
-const getConfigPath = () => path.join(os.homedir(), '.aicommit')
+export const getConfigPath = () => path.join(os.homedir(), '.aicommit')
+
+const getConfigTemplate = () => `{
+  "activeProviderName": "openai",
+  "providers": [
+    {
+      "name": "openai",
+      "baseUrl": "https://api.openai.com/v1",
+      "apiKey": "sk-your-api-key",
+      "model": "gpt-4o-mini"
+    }
+  ]
+}`
 
 const validateConfig = (config: AppType): AppType => {
   if (!config.activeProviderName) {
-    throw new Error(`no activeProviderName`)
+    throw new Error(`missing "activeProviderName" in ${getConfigPath()}`)
   }
-  if (config.providers.length === 0) {
-    throw new Error(`no providers`)
+  if (!Array.isArray(config.providers) || config.providers.length === 0) {
+    throw new Error(`missing "providers" in ${getConfigPath()}`)
   }
   return config
 }
@@ -36,7 +48,9 @@ export const getProviderConfig = () => {
     provider => provider.name === config.activeProviderName
   )
   if (!provider) {
-    throw new Error(`no valid provider: ${config}`)
+    throw new Error(
+      `active provider "${config.activeProviderName}" was not found in ${getConfigPath()}`
+    )
   }
   return provider
 }
@@ -44,10 +58,17 @@ export const getProviderConfig = () => {
 export const getConfig = (): AppType => {
   const configPath = getConfigPath()
   if (!fileExists(configPath)) {
-    throw new Error(`need ai config`)
+    throw new Error(
+      `missing AI config at ${configPath}\n\nCreate the file with content like:\n${getConfigTemplate()}`
+    )
   }
   const data = readFileSync(configPath, 'utf-8')
 
-  const config = JSON.parse(data)
+  let config: AppType
+  try {
+    config = JSON.parse(data)
+  } catch {
+    throw new Error(`invalid JSON in ${configPath}`)
+  }
   return validateConfig(config)
 }

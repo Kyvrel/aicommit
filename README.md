@@ -60,6 +60,8 @@ Create a file at `~/.aicommit`:
 }
 ```
 
+If the file is missing or invalid, `aicommit` will stop before staging changes and print the expected config path.
+
 Gemini example:
 
 ```json
