@@ -11,7 +11,8 @@
     "build": "tsc",
     "start": "node dist/cli.js",
     "dev": "tsc -w",
-    "install-global": "pnpm run build && pnpm add -g ."
+    "link": "pnpm run build && pnpm link",
+    "install-local": "pnpm run build && pnpm add -g ."
   },
   "keywords": [
     "git",

@@ -21,10 +21,16 @@ You can run it without global install:
 node dist/cli.js
 ```
 
-Or install it globally:
+For local development, link the CLI:
 
 ```bash
-pnpm install -g .
+pnpm link
+```
+
+Or install the local package after development:
+
+```bash
+pnpm install-local
 ```
 
 ## Usage
