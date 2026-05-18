@@ -26,10 +26,16 @@ make build
 `aicommit` can be packaged by GitHub Actions as a release asset named
 `aicommit-linux-x64.tar.gz`.
 
-- Push a tag such as `v1.0.1` to publish a release automatically.
-- Or run the `Release` workflow manually and provide a tag name.
+- Every push to `main` automatically updates the rolling `latest` release.
+- You can still run the `Release` workflow manually and provide a tag name for a versioned release.
 
-You can create and push a release tag locally with:
+Push `main` to publish the latest build:
+
+```bash
+make latest-release
+```
+
+Create and push a versioned release tag when needed:
 
 ```bash
 make release VERSION=v1.0.1

@@ -2,13 +2,13 @@ name: Release
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       release_tag:
-        description: Release tag to create or update, for example v1.0.1
-        required: true
+        description: Release tag to create or update. Defaults to latest.
+        required: false
         type: string
 
 permissions:
@@ -25,14 +25,21 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set release tag
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ inputs.release_tag }}" ]; then
             echo "RELEASE_TAG=${{ inputs.release_tag }}" >> "$GITHUB_ENV"
           else
-            echo "RELEASE_TAG=${{ github.ref_name }}" >> "$GITHUB_ENV"
+            echo "RELEASE_TAG=latest" >> "$GITHUB_ENV"
           fi
+
+      - name: Update release tag
+        run: |
+          git tag -f "${RELEASE_TAG}" "${GITHUB_SHA}"
+          git push origin "refs/tags/${RELEASE_TAG}" --force
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -40,10 +47,10 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
 
-      - name: Enable pnpm
-        run: |
-          corepack enable
-          corepack prepare pnpm@${PNPM_VERSION} --activate
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -76,4 +83,5 @@ jobs:
           tag_name: ${{ env.RELEASE_TAG }}
           target_commitish: ${{ github.sha }}
           generate_release_notes: true
+          name: ${{ env.RELEASE_TAG }}
           files: ${{ env.ASSET_NAME }}
