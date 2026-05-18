@@ -15,6 +15,36 @@ pnpm install
 pnpm build
 ```
 
+Or use the local Makefile:
+
+```bash
+make build
+```
+
+## Release Deployment
+
+`aicommit` can be packaged by GitHub Actions as a release asset named
+`aicommit-linux-x64.tar.gz`.
+
+- Push a tag such as `v1.0.1` to publish a release automatically.
+- Or run the `Release` workflow manually and provide a tag name.
+
+You can create and push a release tag locally with:
+
+```bash
+make release VERSION=v1.0.1
+```
+
+The archive contains:
+
+- `dist/`
+- production `node_modules/`
+- `package.json`
+- `.release-version`
+
+This lets deployment systems install `aicommit` from GitHub Releases without
+running `pnpm build` on the target machine.
+
 You can run it without global install:
 
 ```bash
